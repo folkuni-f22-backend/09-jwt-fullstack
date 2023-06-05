@@ -94,6 +94,10 @@ app.get('/secret', (req, res) => {
 	}
 })
 
+// Alternativ för att hantera autentisering med middleware:
+// app.use('/api/secrets', authenticateJwt)
+// app.get('/api/secrets', authenticateJwt, (req, res) => {})
+
 
 // starta servern
 app.listen(port, () => {
