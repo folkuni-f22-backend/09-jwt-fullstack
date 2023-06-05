@@ -16,6 +16,7 @@ app.use( cors() )
 app.use( express.json() )
 app.use((req, res, next) => {
 	console.log(`${req.method}  ${req.url} `, req.body)
+	// console.log(req.headers.authorization)
 	next()
 }) 
 
@@ -64,6 +65,35 @@ let users = [
 ]
 
 // GET /secret
+app.get('/secret', (req, res) => {
+	let authHeader = req.headers.authorization
+	// console.log('Secret 1: ', authHeader)
+	if( !authHeader ) {
+		res.status(401).send({
+			message: 'You must be authenticated to view this very secret data.'
+		})
+		return
+	}
+	let token = authHeader.replace('Bearer: ', '')
+
+	try {
+		let decoded = jwt.verify(token, secret)
+		console.log('GET /secret decoded: ', decoded)
+		let userId = decoded.userId
+		let user = users.find(u => u.id === userId)
+		console.log(`User "${user.username}" has access to secret data.`)
+		// Vi kan hämta info om användaren med hjälp av userId
+		
+		res.send({
+			message: 'This is secret data. Because you are authenticated.'
+		})
+
+	} catch(error) {
+		console.log('GET /secret error: ' + error.message)
+		res.sendStatus(401)
+	}
+})
+
 
 // starta servern
 app.listen(port, () => {
